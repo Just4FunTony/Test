@@ -32,12 +32,12 @@ public class GameManager : MonoBehaviour
         i += Time.deltaTime * gameSpeed / 5;
     }
 
-    private void AddScore()
+    private void addScore()
     {
         _score.AddScore(1);
         _gameUI.SetScore(_score.GetScore());
     }
-    private void GetHit()
+    private void getHit()
     {
         int currentHp = _health.GetHit(1);
         if (currentHp <= 0) EndGame();
@@ -54,19 +54,18 @@ public class GameManager : MonoBehaviour
         _gameUI.SetScore(_score.GetScore());
         _gameUI.SetHPValue(_health.Value);
 
-        _bubbleSpawner.addScore += AddScore;
-        _bubbleSpawner.getHit += GetHit;
+        _bubbleSpawner.addScore += addScore;
+        _bubbleSpawner.getHit += getHit;
         onPauseSwitch += Pause;
         _gameUI.OnSave += SaveScore;
         _gameUI.PauseActionInit(onPauseSwitch);
-
         if (Time.timeScale == 0) onPauseSwitch();
     }
 
     public void EndGame()
     {
-        _bubbleSpawner.addScore -= AddScore;
-        _bubbleSpawner.getHit -= GetHit;
+        _bubbleSpawner.addScore -= addScore;
+        _bubbleSpawner.getHit -= getHit;
         _gameUI.LoseScreen();
         onPauseSwitch();
     }

@@ -13,7 +13,7 @@ public class MenuUI : MonoBehaviour
     private PlayerDataUI _playerDataUIprefab;
     [SerializeField] private Transform _anchorScoreboardTransform;
     [SerializeField] private GameObject _scoreboardGO;
-    private ScoreDataLoader _scoreDataLoader;
+    private ILoad _scoreDataLoader;
     private SceneLoader _sceneLoader;
 
     private void Start()
@@ -21,7 +21,7 @@ public class MenuUI : MonoBehaviour
         _playerDataUIprefab = Resources.Load<PlayerDataUI>("Prefabs/PlayerInfoUI");
         _scoreDataLoader = new ScoreDataLoader();
         _sceneLoader = new SceneLoader();
-        _bestScore.text = _scoreDataLoader.GetHighScore().ToString();
+        _bestScore.text = _scoreDataLoader.LoadHighScore().ToString();
     }
 
     public void PlayButton()
@@ -49,8 +49,6 @@ public class MenuUI : MonoBehaviour
     private void OpenScoreboard()
     {
         List<PlayerData> scoreList = _scoreDataLoader.LoadScore();
-
-        scoreList = scoreList.OrderBy(p => p.Score).ToList();
 
         for (int i = 0; i < scoreList.Count; i++)
         {

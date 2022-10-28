@@ -1,11 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 
-public class ScoreDataLoader 
+public class ScoreDataLoader : ISave, ILoad
 {
 
     private List <PlayerData> _playersData = new List<PlayerData>();
@@ -18,15 +17,9 @@ public class ScoreDataLoader
         _playersData = LoadScore();
     }
 
-    public int GetHighScore()
+    public int LoadHighScore()
     {
-        int max = 0;
-        if(_playersData.Count != 0)
-        foreach(PlayerData playerData in _playersData)
-        {
-            if (max < playerData.Score) max = playerData.Score;
-        }
-        return max;
+        return _playersData.Last().Score;
     }
 
     public void CreateNewPlayerData(string name, int score)
@@ -38,9 +31,8 @@ public class ScoreDataLoader
     public List <PlayerData> LoadScore()
     {
         string json = "";
-        FileStream fs = new FileStream(_path, FileMode.OpenOrCreate);///Не успел убрать этот костыль :(
-        fs.Close();
-        using (var reader = new StreamReader(_path))
+        FileStream fileStream = new FileStream(_path, FileMode.OpenOrCreate);
+        using (var reader = new StreamReader(fileStream))
         {
             string line;
             while((line = reader.ReadLine())!= null)
@@ -52,7 +44,8 @@ public class ScoreDataLoader
         {
             return new List<PlayerData>();
         }
-        List<PlayerData> pd = JsonConvert.DeserializeObject<List<PlayerData>>(json);
+        List<PlayerData> pd = JsonConvert.DeserializeObject<List<PlayerData>>(json).OrderBy(p => p.Score).ToList();
+        fileStream.Close();
         return pd;
     }
     private void SaveScore()

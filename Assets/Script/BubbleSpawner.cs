@@ -5,14 +5,14 @@ using System;
 
 public class BubbleSpawner
 {
-    private BubblePool _bubblePool;
+    private IGetBubble _bubblePool;
     private BubbleSettings _bubbleSettings;
 
     public Action addScore, getHit;
     public BubbleSpawner(int gameSpeed)
     {
         _bubbleSettings = new BubbleSettings(gameSpeed);
-        _bubblePool = new BubblePool(_bubbleSettings.BubbleStartCount);
+        _bubblePool = new BubblePool();
     }
     public void CreateBubble()
     {
@@ -24,18 +24,8 @@ public class BubbleSpawner
 
         bubble.InitBubble(color, pos, new Vector3(pos.x, _bubbleSettings.maxPosY()), _bubbleSettings.DestroyTime());
 
-        bubble.onCliked += returnBubbleInPool;
         bubble.onCliked += AddScore;
-
-        bubble.onDestroyOvertime += returnBubbleInPool;
         bubble.onDestroyOvertime += GetHit;
-    }
-
-    private void returnBubbleInPool(Bubble bubble)
-    {
-        bubble.onCliked -= returnBubbleInPool;
-        bubble.onDestroyOvertime -= returnBubbleInPool;
-        _bubblePool.ReturnBubbleInPool(bubble);
     }
 
     public void AddScore(Bubble bubble)

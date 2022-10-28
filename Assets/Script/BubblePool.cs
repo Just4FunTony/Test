@@ -2,27 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BubblePool
+public class BubblePool : IGetBubble
 {
     private List<Bubble> _bubblesInPool;
 
     private Bubble bubblePrefab;
 
-    public BubblePool(int poolCount) //CreatePool
+    private const int START_POOL_COUNT = 10;
+
+    public BubblePool() //CreatePool
     {
         bubblePrefab = Resources.Load<Bubble>("Prefabs/Bubble");
         _bubblesInPool = new List<Bubble>();
-        for (int i = 0; i < poolCount; i++)
+        for (int i = 0; i < START_POOL_COUNT; i++)
         {
             AddBubbleInPool();
         }
     }
 
-    public void ReturnBubbleInPool(Bubble bubble)
+    private void returnBubbleInPool(Bubble bubble)
     {
+        bubble.onCliked -= returnBubbleInPool;
+        bubble.onDestroyOvertime -= returnBubbleInPool;
         _bubblesInPool.Add(bubble);
     }
-
 
     public Bubble GetBubble()
     {
@@ -30,6 +33,8 @@ public class BubblePool
             AddBubbleInPool();
         Bubble bubble = _bubblesInPool[0];
         _bubblesInPool.Remove(bubble);
+        bubble.onCliked += returnBubbleInPool;
+        bubble.onDestroyOvertime += returnBubbleInPool;
         return bubble;
     }
 

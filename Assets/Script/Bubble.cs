@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 [RequireComponent(typeof(CircleCollider2D), typeof(SpriteRenderer), typeof(Animator))]
-public class Bubble : MonoBehaviour, IDestructible
+public class Bubble : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Animator _animator;
 
-    IEnumerator _waitOnDestroy, _lifeTime;
+    IEnumerator _waitOnDestroy, _updateToDestroy;
 
     private Vector3 _starPos;
     private Vector3 _targetPos;
@@ -29,27 +29,32 @@ public class Bubble : MonoBehaviour, IDestructible
         _targetPos = targetPos;
         gameObject.SetActive(true);
         _spriteRenderer.color = color;
-        DestroyOnOvertime(timeToDestroy);
+        destroyOnOvertime(timeToDestroy);
     }
 
-    public void DestroyOnClick()
+    private void destroyOnClick()
     {
-        StopCoroutine(_lifeTime);
+        StopCoroutine(_updateToDestroy);
         _waitOnDestroy = waitOnDestroy(); 
         StartCoroutine(_waitOnDestroy);
     }
-    public void DestroyOnOvertime(float timeToDestroy)
+    private void destroyOnOvertime(float timeToDestroy)
     {
-        _lifeTime = lifeTime(timeToDestroy);
-        StartCoroutine(_lifeTime);
+        _updateToDestroy = updateToDestroy(timeToDestroy);
+        StartCoroutine(_updateToDestroy);
     }
 
-    public void OnMouseDown() => DestroyOnClick();
-    private IEnumerator lifeTime(float time)
+    public void OnMouseDown() => destroyOnClick();
+
+    private void Move(float i)
+    {
+       transform.position = Vector3.Lerp(_starPos, _targetPos, i);
+    }
+    private IEnumerator updateToDestroy(float time)
     {
         for(float i = 0; i < 1; i += Time.deltaTime / time)
         {
-            transform.position = Vector3.Lerp(_starPos, _targetPos, i);
+            Move(i);
             yield return null;
         }
         gameObject.SetActive(false);
